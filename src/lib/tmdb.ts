@@ -18,6 +18,23 @@ export interface TMDBShow {
   first_air_date?: string;
 }
 
+export interface TMDBShowDetails extends TMDBShow {
+  genres: { id: number; name: string }[];
+  runtime?: number;
+  number_of_seasons?: number;
+  status: string;
+}
+
+export interface TMDBEpisode {
+  id: number;
+  name: string;
+  overview: string;
+  still_path: string;
+  air_date: string;
+  episode_number: number;
+  season_number: number;
+}
+
 async function fetchFromTMDB(endpoint: string) {
   try {
     const url = new URL(`${TMDB_BASE_URL}${endpoint}`);
@@ -70,4 +87,43 @@ export function getImageUrl(path: string, size: 'w500' | 'original' = 'w500'): s
     return '/placeholder-image.jpg'; // You should add a placeholder image
   }
   return `https://image.tmdb.org/t/p/${size}${path}`;
+}
+
+export async function fetchShowDetails(type: string, id: string): Promise<TMDBShowDetails> {
+  try {
+    const url = new URL(`${TMDB_BASE_URL}/${type}/${id}`);
+    url.searchParams.append('api_key', TMDB_API_KEY);
+    
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${type} details`);
+    }
+
+    const data = await response.json();
+    return {
+      ...data,
+      media_type: type,
+    };
+  } catch (error) {
+    console.error(`Error fetching ${type} details:`, error);
+    throw error;
+  }
+}
+
+export async function fetchSeasonEpisodes(showId: string, seasonNumber: number): Promise<TMDBEpisode[]> {
+  try {
+    const url = new URL(`${TMDB_BASE_URL}/tv/${showId}/season/${seasonNumber}`);
+    url.searchParams.append('api_key', TMDB_API_KEY);
+    
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw new Error('Failed to fetch season episodes');
+    }
+
+    const data = await response.json();
+    return data.episodes;
+  } catch (error) {
+    console.error('Error fetching season episodes:', error);
+    throw error;
+  }
 } 
