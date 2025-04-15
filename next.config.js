@@ -9,6 +9,13 @@ const nextConfig = {
       },
     ],
   },
+  // Optimize for production
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  // Enable static optimization where possible
+  output: 'standalone',
 }
 
 module.exports = nextConfig 
