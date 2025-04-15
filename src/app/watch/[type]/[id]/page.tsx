@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { getImageUrl } from '@/lib/tmdb';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -27,7 +27,6 @@ interface Episode {
 }
 
 export default function WatchPage({ params }: { params: { type: string; id: string } }) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [show, setShow] = useState<ShowDetails | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);

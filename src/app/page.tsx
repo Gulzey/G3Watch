@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { fetchTrending, fetchMovies, fetchTVShows, fetchAnime, getImageUrl, TMDBShow } from "@/lib/tmdb";
 
 export default function Home() {
-  const contentRef = useRef<HTMLDivElement>(null);
   const moviesRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");

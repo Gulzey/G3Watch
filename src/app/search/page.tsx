@@ -114,9 +114,9 @@ export default function SearchPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <p className="text-xl text-gray-400">No results found</p>
-              <p className="text-gray-500 mt-2">Try different keywords or browse our categories</p>
+            <div className="text-center text-gray-400">
+              <p className="text-xl mb-2">No results found</p>
+              <p>Try searching with different keywords or browse our categories</p>
             </div>
           )}
         </div>

@@ -18,7 +18,7 @@ export async function GET() {
 
     const data = await response.json();
     return NextResponse.json({ success: true, data });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to connect to TMDB API' },
       { status: 500 }
