@@ -9,10 +9,12 @@ const nextConfig = {
       },
     ],
   },
-  // Production optimizations
+  // Optimize for production
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  // Enable static optimization where possible
   output: 'standalone',
-  poweredByHeader: false,
-  reactStrictMode: true,
 }
 
 module.exports = nextConfig 

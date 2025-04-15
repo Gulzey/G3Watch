@@ -211,7 +211,7 @@ export default function Home() {
                   className="flex-none w-64 rounded-xl overflow-hidden bg-gray-800/50 hover:bg-gray-800/80 transition-all duration-300 transform hover:scale-105 cursor-pointer group"
                 >
                   <div className="relative aspect-[16/9]">
-                    <Image
+          <Image
                       src={getImageUrl(show.poster_path)}
                       alt={show.title || ''}
                       fill
@@ -245,7 +245,7 @@ export default function Home() {
                   className="flex-none w-64 rounded-xl overflow-hidden bg-gray-800/50 hover:bg-gray-800/80 transition-all duration-300 transform hover:scale-105 cursor-pointer group"
                 >
                   <div className="relative aspect-[16/9]">
-                    <Image
+          <Image
                       src={getImageUrl(show.poster_path)}
                       alt={show.name || ''}
                       fill
@@ -279,7 +279,7 @@ export default function Home() {
                   className="flex-none w-64 rounded-xl overflow-hidden bg-gray-800/50 hover:bg-gray-800/80 transition-all duration-300 transform hover:scale-105 cursor-pointer group"
                 >
                   <div className="relative aspect-[16/9]">
-                    <Image
+          <Image
                       src={getImageUrl(show.poster_path)}
                       alt={show.name || ''}
                       fill
