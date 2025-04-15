@@ -1,35 +1,34 @@
 'use client';
 
-import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import { searchShows, getImageUrl, TMDBShow } from "@/lib/tmdb";
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
+import { TMDBShow, searchShows, getImageUrl } from '@/lib/tmdb';
 
 export default function SearchPage() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
-  const router = useRouter();
   const [results, setResults] = useState<TMDBShow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchResults = async () => {
-      if (query) {
-        try {
-          const searchResults = await searchShows(query);
-          setResults(searchResults);
-        } catch (error) {
-          console.error('Error fetching search results:', error);
-        } finally {
-          setLoading(false);
-        }
-      } else {
+      try {
+        const data = await searchShows(query);
+        setResults(data);
+      } catch (error) {
+        console.error('Error searching shows:', error);
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchResults();
+    if (query) {
+      fetchResults();
+    } else {
+      setLoading(false);
+    }
   }, [query]);
 
   if (loading) {
@@ -41,58 +40,51 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-            G3WATCH
-          </Link>
-          <div className="relative w-1/3">
-            <input
-              type="text"
-              defaultValue={query}
-              placeholder="Search for movies, series, or anime..."
-              className="w-full bg-black/80 border border-gray-700 rounded-full py-2 px-4 text-white placeholder-gray-400 focus:outline-none focus:border-gray-500 transition-colors"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  const value = (e.target as HTMLInputElement).value;
-                  router.push(`/search?q=${encodeURIComponent(value)}`);
-                }
-              }}
-            />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </div>
-        </div>
+    <div className="min-h-screen bg-black">
+      <style jsx global>{`
+        /* Custom scrollbar styling */
+        .scrollbar-hide::-webkit-scrollbar {
+          height: 8px;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar-track {
+          background: #000;
+          border-radius: 4px;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar-thumb {
+          background: linear-gradient(to right, #9333ea, #ec4899);
+          border-radius: 4px;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(to right, #7e22ce, #db2777);
+        }
+      `}</style>
 
-        {/* Search Results */}
-        <div>
-          <h1 className="text-3xl font-bold mb-6">
-            Search Results for "{query}"
+      {/* Header with Logo */}
+      <header className="p-4">
+        <Link href="/" className="inline-block">
+          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+            G3WATCH
           </h1>
-          
+        </Link>
+      </header>
+
+      <div className="container mx-auto px-4 py-8">
+        <h2 className="text-3xl font-bold mb-8">
+          Search Results for: <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">{query}</span>
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {results.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {results.map((show) => (
-                <div
-                  key={show.id}
-                  onClick={() => router.push(`/shows/${show.media_type}/${show.id}`)}
-                  className="bg-gray-800/50 rounded-xl overflow-hidden hover:bg-gray-800/80 transition-colors cursor-pointer group"
-                >
-                  <div className="relative aspect-[16/9]">
+            results.map((show) => (
+              <div
+                key={show.id}
+                className="bg-gray-800/50 rounded-xl overflow-hidden hover:bg-gray-800/80 transition-all duration-300 transform hover:scale-105 group"
+              >
+                <Link href={`/shows/${show.media_type}/${show.id}`}>
+                  <div className="relative aspect-[2/3]">
                     <Image
                       src={getImageUrl(show.poster_path)}
                       alt={show.title || show.name || ''}
@@ -100,21 +92,16 @@ export default function SearchPage() {
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="text-xl font-bold mb-2">{show.title || show.name}</h3>
-                    <p className="text-gray-400">{show.overview}</p>
-                    <div className="mt-2 flex items-center gap-2">
-                      <span className="text-sm text-gray-500">{show.media_type === 'movie' ? 'Movie' : 'TV Show'}</span>
-                      <span className="text-sm text-gray-500">•</span>
-                      <span className="text-sm text-gray-500">{show.vote_average.toFixed(1)}/10</span>
+                    <div className="absolute bottom-0 left-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <h3 className="text-lg font-semibold mb-2">{show.title || show.name}</h3>
+                      <p className="text-sm text-gray-300 line-clamp-3">{show.overview}</p>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                </Link>
+              </div>
+            ))
           ) : (
-            <div className="text-center text-gray-400">
+            <div className="col-span-full text-center text-gray-400">
               <p className="text-xl mb-2">No results found</p>
               <p>Try searching with different keywords or browse our categories</p>
             </div>
