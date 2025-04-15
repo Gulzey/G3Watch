@@ -29,7 +29,15 @@ interface Episode {
   air_date: string;
 }
 
-export default function ShowPage({ params }: { params: { type: string; id: string } }) {
+interface PageProps {
+  params: {
+    type: string;
+    id: string;
+  };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export default function ShowPage({ params }: PageProps) {
   const [show, setShow] = useState<ShowDetails | null>(null);
   const [episodes, setEpisodes] = useState<Episode[]>([]);
   const [selectedSeason, setSelectedSeason] = useState(1);
