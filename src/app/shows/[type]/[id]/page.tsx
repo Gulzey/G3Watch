@@ -1,8 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { getImageUrl } from '@/lib/tmdb';
+import { getImageUrl, TMDBShow, TMDBSeason, TMDBEpisode } from '@/lib/tmdb';
 
-async function getShowDetails(type: string, id: string) {
+async function getShowDetails(type: string, id: string): Promise<TMDBShow> {
   const response = await fetch(
     `https://api.themoviedb.org/3/${type}/${id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
   );
@@ -14,7 +14,7 @@ async function getShowDetails(type: string, id: string) {
   return response.json();
 }
 
-async function getEpisodes(showId: string, season: number) {
+async function getEpisodes(showId: string, season: number): Promise<TMDBSeason | null> {
   const response = await fetch(
     `https://api.themoviedb.org/3/tv/${showId}/season/${season}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`
   );
@@ -63,8 +63,12 @@ export default async function ShowPage({ params }: { params: { type: string; id:
             <h1 className="text-4xl font-bold mb-4">{show.title || show.name}</h1>
             
             <div className="flex items-center gap-4 text-gray-400 mb-6">
-              <span>{new Date(show.release_date || show.first_air_date).getFullYear()}</span>
-              <span>•</span>
+              {(show.release_date || show.first_air_date) && (
+                <>
+                  <span>{new Date(show.release_date || show.first_air_date).getFullYear()}</span>
+                  <span>•</span>
+                </>
+              )}
               <span>{show.vote_average.toFixed(1)} ★</span>
               {show.runtime && (
                 <>
@@ -109,7 +113,7 @@ export default async function ShowPage({ params }: { params: { type: string; id:
               Episodes
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {episodes.episodes.map((episode: any) => (
+              {episodes.episodes.map((episode: TMDBEpisode) => (
                 <div
                   key={episode.id}
                   className="bg-gray-800/50 rounded-xl overflow-hidden hover:bg-gray-800/80 transition-all duration-300 transform hover:scale-105 group"

@@ -16,6 +16,30 @@ export interface TMDBShow {
   vote_average: number;
   release_date?: string;
   first_air_date?: string;
+  original_language: string;
+  origin_country?: string[];
+  runtime?: number;
+  number_of_seasons?: number;
+  genres?: { id: number; name: string }[];
+}
+
+export interface TMDBEpisode {
+  id: number;
+  name: string;
+  overview: string;
+  still_path: string;
+  episode_number: number;
+  air_date: string;
+}
+
+export interface TMDBSeason {
+  id: number;
+  episodes: TMDBEpisode[];
+  season_number: number;
+  name: string;
+  overview: string;
+  poster_path: string;
+  air_date: string;
 }
 
 async function fetchFromTMDB(endpoint: string) {
@@ -71,7 +95,7 @@ export async function fetchAnime(): Promise<TMDBShow[]> {
   const results = await fetchFromTMDB(endpoint);
   
   // Filter to keep only Japanese shows
-  const japaneseAnime = results.filter((show: any) => 
+  const japaneseAnime = results.filter((show: TMDBShow) => 
     show.original_language === 'ja' || // Japanese language
     (show.origin_country && show.origin_country.includes('JP')) // From Japan
   );
