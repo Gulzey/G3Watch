@@ -201,7 +201,23 @@ export default function Home() {
 
         {/* Movies */}
         <section ref={moviesRef} className="px-4">
-          <h2 className="text-2xl font-bold mb-6">Movies</h2>
+          <div className="flex items-center justify-between mb-6">
+            <button 
+              onClick={() => router.push('/movies')}
+              className="text-2xl font-bold hover:text-purple-400 transition-colors flex items-center gap-2 group"
+            >
+              Movies
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-6 w-6 group-hover:translate-x-1 transition-transform" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
           <div className="relative">
             <div className="flex overflow-x-auto gap-6 pb-6 scrollbar-hide">
               {movies.map((show) => (
@@ -235,7 +251,23 @@ export default function Home() {
 
         {/* Series */}
         <section className="px-4">
-          <h2 className="text-2xl font-bold mb-6">Series</h2>
+          <div className="flex items-center justify-between mb-6">
+            <button 
+              onClick={() => router.push('/series')}
+              className="text-2xl font-bold hover:text-purple-400 transition-colors flex items-center gap-2 group"
+            >
+              Series
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-6 w-6 group-hover:translate-x-1 transition-transform" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
           <div className="relative">
             <div className="flex overflow-x-auto gap-6 pb-6 scrollbar-hide">
               {series.map((show) => (
@@ -269,34 +301,52 @@ export default function Home() {
 
         {/* Anime */}
         <section className="px-4">
-          <h2 className="text-2xl font-bold mb-6">Anime</h2>
+          <div className="flex items-center justify-between mb-6">
+            <button 
+              onClick={() => router.push('/anime')}
+              className="text-2xl font-bold hover:text-purple-400 transition-colors flex items-center gap-2 group"
+            >
+              Anime
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-6 w-6 group-hover:translate-x-1 transition-transform" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
           <div className="relative">
             <div className="flex overflow-x-auto gap-6 pb-6 scrollbar-hide">
-              {anime.map((show) => (
-                <div
-                  key={show.id}
-                  onClick={() => handleShowClick(show.id, 'tv')}
-                  className="flex-none w-64 rounded-xl overflow-hidden bg-gray-800/50 hover:bg-gray-800/80 transition-all duration-300 transform hover:scale-105 cursor-pointer group"
-                >
-                  <div className="relative aspect-[16/9]">
-          <Image
-                      src={getImageUrl(show.poster_path)}
-                      alt={show.name || ''}
-                      fill
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="absolute bottom-0 left-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <h3 className="text-lg font-semibold">{show.name}</h3>
-                      <p className="text-sm text-gray-300">{show.overview}</p>
+              {anime
+                .filter(show => show.original_language === 'ja')
+                .map((show) => (
+                  <div
+                    key={show.id}
+                    onClick={() => handleShowClick(show.id, 'tv')}
+                    className="flex-none w-64 rounded-xl overflow-hidden bg-gray-800/50 hover:bg-gray-800/80 transition-all duration-300 transform hover:scale-105 cursor-pointer group"
+                  >
+                    <div className="relative aspect-[16/9]">
+                      <Image
+                        src={getImageUrl(show.poster_path)}
+                        alt={show.name || ''}
+                        fill
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute bottom-0 left-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <h3 className="text-lg font-semibold">{show.name}</h3>
+                        <p className="text-sm text-gray-300">{show.overview}</p>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold truncate">{show.name}</h3>
+                      <p className="text-sm text-gray-400 truncate">{show.overview}</p>
                     </div>
                   </div>
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold truncate">{show.name}</h3>
-                    <p className="text-sm text-gray-400 truncate">{show.overview}</p>
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         </section>

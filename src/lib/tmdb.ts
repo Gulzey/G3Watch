@@ -58,7 +58,25 @@ export async function fetchTVShows(): Promise<TMDBShow[]> {
 }
 
 export async function fetchAnime(): Promise<TMDBShow[]> {
-  return fetchFromTMDB('/discover/tv?with_genres=16&sort_by=popularity.desc');
+  // First, get a larger set of animated shows
+  const endpoint = '/discover/tv?' + new URLSearchParams({
+    with_genres: '16',
+    sort_by: 'popularity.desc',
+    'vote_count.gte': '50',
+    page: '1',
+    include_adult: 'false'
+  }).toString();
+  
+  // Fetch the initial results
+  const results = await fetchFromTMDB(endpoint);
+  
+  // Filter to keep only Japanese shows
+  const japaneseAnime = results.filter((show: any) => 
+    show.original_language === 'ja' || // Japanese language
+    (show.origin_country && show.origin_country.includes('JP')) // From Japan
+  );
+
+  return japaneseAnime;
 }
 
 export async function searchShows(query: string): Promise<TMDBShow[]> {
@@ -70,4 +88,4 @@ export function getImageUrl(path: string, size: 'w500' | 'original' = 'w500'): s
     return '/placeholder-image.jpg'; // You should add a placeholder image
   }
   return `https://image.tmdb.org/t/p/${size}${path}`;
-} 
+}
