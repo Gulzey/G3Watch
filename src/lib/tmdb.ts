@@ -74,11 +74,67 @@ export async function fetchTrending(): Promise<TMDBShow[]> {
 }
 
 export async function fetchMovies(): Promise<TMDBShow[]> {
-  return fetchFromTMDB('/movie/popular');
+  const pages = 5; // Fetch 5 pages of results
+  let allResults: TMDBShow[] = [];
+
+  // Fetch multiple pages of movies
+  for (let page = 1; page <= pages; page++) {
+    const endpoint = '/discover/movie?' + new URLSearchParams({
+      sort_by: 'popularity.desc',
+      'vote_count.gte': '100',
+      page: page.toString(),
+      include_adult: 'false',
+      with_original_language: 'en', // Focus on English language movies
+      'vote_average.gte': '6.0', // Minimum rating of 6
+    }).toString();
+    
+    try {
+      const results = await fetchFromTMDB(endpoint);
+      allResults = [...allResults, ...results];
+    } catch (error) {
+      console.error(`Error fetching movies page ${page}:`, error);
+    }
+  }
+  
+  // Filter to ensure we have required images and add media type
+  const movies = allResults
+    .filter((movie: TMDBShow) => movie.poster_path && movie.backdrop_path)
+    .map((movie: TMDBShow) => ({ ...movie, media_type: 'movie' as const }));
+
+  // Sort by popularity and rating
+  return movies.sort((a, b) => b.vote_average - a.vote_average);
 }
 
 export async function fetchTVShows(): Promise<TMDBShow[]> {
-  return fetchFromTMDB('/tv/popular');
+  const pages = 5; // Fetch 5 pages of results
+  let allResults: TMDBShow[] = [];
+
+  // Fetch multiple pages of TV shows
+  for (let page = 1; page <= pages; page++) {
+    const endpoint = '/discover/tv?' + new URLSearchParams({
+      sort_by: 'popularity.desc',
+      'vote_count.gte': '50',
+      page: page.toString(),
+      include_adult: 'false',
+      'vote_average.gte': '7.0', // Higher minimum rating for TV shows
+      with_status: '0', // Only shows still running
+    }).toString();
+    
+    try {
+      const results = await fetchFromTMDB(endpoint);
+      allResults = [...allResults, ...results];
+    } catch (error) {
+      console.error(`Error fetching TV shows page ${page}:`, error);
+    }
+  }
+  
+  // Filter to ensure we have required images and add media type
+  const tvShows = allResults
+    .filter((show: TMDBShow) => show.poster_path && show.backdrop_path)
+    .map((show: TMDBShow) => ({ ...show, media_type: 'tv' as const }));
+
+  // Sort by popularity and rating
+  return tvShows.sort((a, b) => b.vote_average - a.vote_average);
 }
 
 export async function fetchAnime(): Promise<TMDBShow[]> {
