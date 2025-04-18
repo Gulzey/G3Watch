@@ -65,7 +65,9 @@ export default async function ShowPage({ params }: { params: { type: string; id:
             <div className="flex items-center gap-4 text-gray-400 mb-6">
               {(show.release_date || show.first_air_date) && (
                 <>
-                  <span>{new Date(show.release_date || show.first_air_date).getFullYear()}</span>
+                  <span>
+                    {new Date(show.release_date || show.first_air_date || '').getFullYear()}
+                  </span>
                   <span>•</span>
                 </>
               )}
