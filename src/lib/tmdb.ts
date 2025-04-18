@@ -118,6 +118,7 @@ export async function fetchTVShows(): Promise<TMDBShow[]> {
       include_adult: 'false',
       'vote_average.gte': '7.0', // Higher minimum rating for TV shows
       with_status: '0', // Only shows still running
+      without_genres: '16', // Exclude animation genre
     }).toString();
     
     try {
@@ -128,9 +129,14 @@ export async function fetchTVShows(): Promise<TMDBShow[]> {
     }
   }
   
-  // Filter to ensure we have required images and add media type
+  // Filter to ensure we have required images, exclude anime, and add media type
   const tvShows = allResults
-    .filter((show: TMDBShow) => show.poster_path && show.backdrop_path)
+    .filter((show: TMDBShow) => 
+      show.poster_path && 
+      show.backdrop_path &&
+      show.original_language !== 'ja' && // Exclude Japanese shows (likely anime)
+      (!show.origin_country || !show.origin_country.includes('JP')) // Exclude shows from Japan
+    )
     .map((show: TMDBShow) => ({ ...show, media_type: 'tv' as const }));
 
   // Sort by popularity and rating
