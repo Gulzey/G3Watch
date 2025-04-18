@@ -82,25 +82,38 @@ export async function fetchTVShows(): Promise<TMDBShow[]> {
 }
 
 export async function fetchAnime(): Promise<TMDBShow[]> {
-  // First, get a larger set of animated shows
-  const endpoint = '/discover/tv?' + new URLSearchParams({
-    with_genres: '16',
-    sort_by: 'popularity.desc',
-    'vote_count.gte': '50',
-    page: '1',
-    include_adult: 'false'
-  }).toString();
+  const pages = 5; // Fetch 5 pages of results
+  let allResults: TMDBShow[] = [];
+
+  // Fetch multiple pages of animated shows
+  for (let page = 1; page <= pages; page++) {
+    const endpoint = '/discover/tv?' + new URLSearchParams({
+      with_genres: '16', // Animation genre
+      sort_by: 'popularity.desc',
+      'vote_count.gte': '20', // Lower the vote count requirement
+      page: page.toString(),
+      include_adult: 'false',
+      with_original_language: 'ja', // Include shows with Japanese as original language
+    }).toString();
+    
+    try {
+      const results = await fetchFromTMDB(endpoint);
+      allResults = [...allResults, ...results];
+    } catch (error) {
+      console.error(`Error fetching anime page ${page}:`, error);
+    }
+  }
   
-  // Fetch the initial results
-  const results = await fetchFromTMDB(endpoint);
-  
-  // Filter to keep only Japanese shows
-  const japaneseAnime = results.filter((show: TMDBShow) => 
-    show.original_language === 'ja' || // Japanese language
-    (show.origin_country && show.origin_country.includes('JP')) // From Japan
+  // Filter to keep only Japanese shows with additional criteria
+  const japaneseAnime = allResults.filter((show: TMDBShow) => 
+    (show.original_language === 'ja' || // Japanese language
+    (show.origin_country && show.origin_country.includes('JP'))) && // From Japan
+    show.poster_path && // Has a poster
+    show.backdrop_path // Has a backdrop image
   );
 
-  return japaneseAnime;
+  // Sort by popularity
+  return japaneseAnime.sort((a, b) => b.vote_average - a.vote_average);
 }
 
 export async function searchShows(query: string): Promise<TMDBShow[]> {
